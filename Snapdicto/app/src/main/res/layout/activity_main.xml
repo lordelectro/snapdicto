@@ -1,18 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="snapdicto.com.snapdicto.MainActivity">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- Camera Surface View." -->
+    <SurfaceView android:id="@+id/preview_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerInParent="true"/>
 
-</android.support.constraint.ConstraintLayout>
+    <!-- Layout for Results after image processing." -->
+    <LinearLayout android:id="@+id/result_view"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/result_view"
+        android:visibility="gone"
+        android:padding="4dip">
+
+        <!-- Layout for Captured Image preview Results." -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="12dip">
+
+            <!-- Layout for Image Preview." -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="right|center_vertical">
+
+                <!-- Image Preview for Captured Word." -->
+                <ImageView android:id="@+id/image_view"
+                    android:layout_width="160dip"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="160dip"
+                    android:maxHeight="160dip"
+                    android:layout_marginBottom="4dip"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Layout for Camera Button." -->
+    <RelativeLayout android:id="@+id/camera_button_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <!-- Status Preview for App translation." -->
+        <TextView android:id="@+id/status_view_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="#0000"
+            android:text=""
+            android:textColor="@color/status_text"
+            android:textSize="14sp"
+            android:autoLink="web"
+            android:clickable="true" />
+
+    </RelativeLayout>
+
+</FrameLayout>
