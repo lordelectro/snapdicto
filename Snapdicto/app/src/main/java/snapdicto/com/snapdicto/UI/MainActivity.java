@@ -56,6 +56,9 @@ import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -102,11 +105,12 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
     private TextView statusViewBottom;
-    private TextView statusViewTop;
+    private TextView statusViewMeaning;
+    //private TextView statusViewTop;
     private TextView ocrResultView;
     private TextView translationView;
-    private View cameraButtonView;
-    private View resultView;
+    // private View cameraButtonView;
+    //   private View resultView;
     private View progressView;
     private OcrResult lastResult;
     private Bitmap lastBitmap;
@@ -120,18 +124,9 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private String targetLanguageReadable; // Language name, for example, "English"
     private int pageSegmentationMode = TessBaseAPI.PageSegMode.PSM_AUTO_OSD;
     //    private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-//    private String characterBlacklist;
-//    private String characterWhitelist;
-    private ShutterButton shutterButton;
-//    private boolean isTranslationActive; // Whether we want to show translations
-//    private boolean isContinuousModeActive; // Whether we are doing OCR in continuous mode
-//    private SharedPreferences prefs;
-//    private SharedPreferences.OnSharedPreferenceChangeListener listener;
-//    private ProgressDialog dialog; // for initOcr - language download & unzip
-//    private ProgressDialog indeterminateDialog; // also for initOcr - init OCR engine
-//    private boolean isEngineReady;
-//    private boolean isPaused;
-//    private static boolean isFirstLaunch; // True if this is the first time the app is being run
+
+//    private ShutterButton shutterButton;
+
 
 
     public Handler getHandler() {
@@ -148,33 +143,22 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
 
     /* USING butter knife Dependency INJECTION */
-//    @Bind(R.id.shutter_button)
-//    ShutterButton shutterButton;
+    @Bind(R.id.shutter_button)
+    ShutterButton shutterButton;
 
-//
-//    @Bind(R.id.camera_button_view)
-//    View cameraButtonView;
-//    @Bind(R.id.result_view)
-//    View resultView;
+    @Bind(R.id.camera_button_view)
+    View cameraButtonView;
 
+    @Bind(R.id.result_view)
+    View resultView;
 
+    @Bind(R.id.status_view_top)
+    TextView statusViewTop;
 
-//
-//    @Bind(R.id.status_view_top)
-//    TextView statusViewTop;
-
-
+//    @Bind(R.id.ocr_dicto_text_view)
+//    TextView statusViewMeaning;
 
 
-
-
-//    MainActivityHandler getHandler() {
-//        return handler;
-//    }
-
-//    public CameraManager getCameraManager() {
-//        return cameraManager;
-//    }
 
     /** Flag to enable display of the on-screen shutter button. */
     private static final boolean DISPLAY_SHUTTER_BUTTON = true;
@@ -278,6 +262,11 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 
 
+        //stating the view to display meaning.
+        statusViewMeaning = (TextView) findViewById(R.id.ocr_dicto_text_view);
+        registerForContextMenu(statusViewMeaning);
+
+
         cameraButtonView = findViewById(R.id.camera_button_view);
 
         resultView = findViewById(R.id.result_view);
@@ -290,14 +279,6 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
         isEngineReady = false;
 
-
-        //DecodeHandler.resetDecodeState();
-        //lastResult = ocrResult;
-
-        //callme();
-
-
-        // Camera shutter button
         if (DISPLAY_SHUTTER_BUTTON) {
 
             //TODO replace with butter knife
@@ -489,8 +470,13 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         isPaused = true;
         handler.stop();
         beepManager.playBeepSoundAndVibrate();
+
+        //if the returned result is a success
         if (lastResult != null) {
             handleOcrDecode(lastResult);
+            //get dictionary meaning of text
+            getmeaning(lastResult);
+
         } else {
             Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.TOP, 0, 0);
@@ -623,34 +609,6 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         return super.onKeyDown(keyCode, event);
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        //    MenuInflater inflater = getMenuInflater();
-//        //    inflater.inflate(R.menu.options_menu, menu);
-//        super.onCreateOptionsMenu(menu);
-//        menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
-//        menu.add(0, ABOUT_ID, 0, "About").setIcon(android.R.drawable.ic_menu_info_details);
-//        return true;
-//    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        Intent intent;
-//        switch (item.getItemId()) {
-//            case SETTINGS_ID: {
-//                intent = new Intent().setClass(this, PreferencesActivity.class);
-//                startActivity(intent);
-//                break;
-//            }
-//            case ABOUT_ID: {
-//                intent = new Intent(this, HelpActivity.class);
-//                intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.ABOUT_PAGE);
-//                startActivity(intent);
-//                break;
-//            }
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
         hasSurface = false;
@@ -828,7 +786,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             bitmapImageView.setImageBitmap(lastBitmap);
         }
 
-        // Display the recognized text
+        // Display the recognized text returned from recognition of image to text
         TextView sourceLanguageTextView = (TextView) findViewById(R.id.source_language_text_view);
         sourceLanguageTextView.setText(sourceLanguageReadable);
         TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
@@ -836,6 +794,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         // Crudely scale betweeen 22 and 32 -- bigger font for shorter text
         int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
         ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
+
+
 
 //        TextView translationLanguageLabelTextView = (TextView) findViewById(R.id.translation_language_label_text_view);
 //        TextView translationLanguageTextView = (TextView) findViewById(R.id.translation_language_text_view);
@@ -863,6 +823,63 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             setProgressBarVisibility(false);
         }
         return true;
+    }
+
+
+    //Retrieving Dictionary Meaning of the Result got from the image.
+    private void getmeaning(final OcrResult ocrResult) {
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final StringBuilder builder = new StringBuilder();
+
+                lastResult = ocrResult;
+                String fetchedresult = ocrResult.getText().toString();
+
+                try {
+
+                    //Using Jsoup Library for WebScripping for information.
+                    Document doc = Jsoup.connect("http://www.dictionary.com/browse/"+fetchedresult).get();
+
+                    //Testing Whether data is returned.
+                    Log.d("Returned Data or Result", fetchedresult);
+
+
+                    //selecting a specific div to be fetched
+                    String Element = doc.select("div.def-content").first().text();
+
+                    //Testing the value of Element returned.
+                    Log.d("Hello", Element);
+
+                    //String Builder to append the String.
+
+                    builder.append(Element);
+
+
+                } catch (IOException e) {
+                    //e.printStackTrace();
+
+                    //Display error.
+                    builder.append("Error :").append(e.getMessage()).append("\n");
+
+
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        //Append Dictionary meaning of returned result.
+                        statusViewMeaning.setText(builder.toString());
+
+                    }
+                });
+            }
+        }).start();
+
+
     }
 
 
@@ -1166,6 +1183,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     /**
      * Gets values from shared preferences and sets the corresponding data members in this activity.
      */
+
     private void retrievePreferences() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
