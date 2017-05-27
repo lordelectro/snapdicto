@@ -76,6 +76,53 @@
             </LinearLayout>
 
 
+            <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView android:id="@+id/ocr_result_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/result_text"
+                        android:textColorLink="@color/result_text"
+                        android:textSize="22sp"
+                        android:paddingLeft="12dip"
+                        android:autoLink="web"/>
+
+                    <TextView android:id="@+id/translation_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/translation_text"
+                        android:textColorLink="@color/translation_text"
+                        android:textSize="22sp"
+                        android:paddingLeft="12dip"
+                        android:autoLink="web"
+                        android:clickable="true"/>
+
+                    <LinearLayout android:id="@+id/indeterminate_progress_indicator_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        >
+
+                        <ProgressBar android:id="@+id/progress_small"
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="12dip"
+                            android:paddingTop="10dip"/>
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+            </ScrollView>
+
+
         </LinearLayout>
 
     </LinearLayout>
@@ -110,6 +157,17 @@
             android:layout_marginTop="8dip"
             android:scaleType="center"
             android:visibility="gone" />
+
+        <TextView android:id="@+id/status_view_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="#0000"
+            android:text=""
+            android:textColor="@color/status_text"
+            android:textSize="14sp"
+            android:autoLink="web"
+            android:clickable="true" />
 
     </RelativeLayout>
 

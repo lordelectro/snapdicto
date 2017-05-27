@@ -25,13 +25,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -68,8 +65,16 @@ import snapdicto.com.snapdicto.activities.PreferencesActivity;
 import snapdicto.com.snapdicto.camera.ShutterButton;
 import snapdicto.com.snapdicto.camera.CameraManager;
 import snapdicto.com.snapdicto.handler.DecodeHandler;
+import snapdicto.com.snapdicto.handler.MainActivityHandler;
+import snapdicto.com.snapdicto.imageprocessing.language.LanguageCodeHelper;
 import snapdicto.com.snapdicto.ocrlib.OcrCharacterHelper;
+import snapdicto.com.snapdicto.ocrlib.OcrInitAsyncTask;
 import snapdicto.com.snapdicto.ocrlib.OcrResult;
+import snapdicto.com.snapdicto.ocrlib.OcrResultFailure;
+import snapdicto.com.snapdicto.ocrlib.OcrResultText;
+
+
+
 
 /**
  * This activity opens the camera and does the actual scanning on a background thread.
@@ -78,7 +83,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         ShutterButton.OnShutterButtonListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-//    private MainActivityHandler handler;
+    //    private MainActivityHandler handler;
 //    private ProgressDialog indeterminateDialog; // also for initOcr - init OCR engine
 //    private boolean hasSurface;
 //    private SharedPreferences prefs;
@@ -97,11 +102,11 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
     private TextView statusViewBottom;
-//    private TextView statusViewTop;
+    private TextView statusViewTop;
     private TextView ocrResultView;
     private TextView translationView;
-//    private View cameraButtonView;
-//    private View resultView;
+    private View cameraButtonView;
+    private View resultView;
     private View progressView;
     private OcrResult lastResult;
     private Bitmap lastBitmap;
@@ -114,10 +119,10 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private String targetLanguageCodeTranslation; // ISO 639-1 language code
     private String targetLanguageReadable; // Language name, for example, "English"
     private int pageSegmentationMode = TessBaseAPI.PageSegMode.PSM_AUTO_OSD;
-//    private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
+    //    private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 //    private String characterBlacklist;
 //    private String characterWhitelist;
-//    private ShutterButton shutterButton;
+    private ShutterButton shutterButton;
 //    private boolean isTranslationActive; // Whether we want to show translations
 //    private boolean isContinuousModeActive; // Whether we are doing OCR in continuous mode
 //    private SharedPreferences prefs;
@@ -129,26 +134,47 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 //    private static boolean isFirstLaunch; // True if this is the first time the app is being run
 
 
-
-
-    /* USING butter knife Dependency INJECTION */
-    @Bind(R.id.shutter_button)
-    ShutterButton shutterButton;
-    @Bind(R.id.camera_button_view)
-    View cameraButtonView;
-    @Bind(R.id.result_view)
-    View resultView;
-
-    @Bind(R.id.status_view_top)
-    TextView statusViewTop;
-
-    MainActivityHandler getHandler() {
+    public Handler getHandler() {
         return handler;
+    }
+
+    public TessBaseAPI getBaseApi() {
+        return baseApi;
     }
 
     public CameraManager getCameraManager() {
         return cameraManager;
     }
+
+
+    /* USING butter knife Dependency INJECTION */
+//    @Bind(R.id.shutter_button)
+//    ShutterButton shutterButton;
+
+//
+//    @Bind(R.id.camera_button_view)
+//    View cameraButtonView;
+//    @Bind(R.id.result_view)
+//    View resultView;
+
+
+
+//
+//    @Bind(R.id.status_view_top)
+//    TextView statusViewTop;
+
+
+
+
+
+
+//    MainActivityHandler getHandler() {
+//        return handler;
+//    }
+
+//    public CameraManager getCameraManager() {
+//        return cameraManager;
+//    }
 
     /** Flag to enable display of the on-screen shutter button. */
     private static final boolean DISPLAY_SHUTTER_BUTTON = true;
@@ -227,7 +253,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
     private String characterBlacklist;
     private String characterWhitelist;
-    private ShutterButton shutterButton;
+    // private ShutterButton shutterButton;
     private boolean isTranslationActive; // Whether we want to show translations
     private boolean isContinuousModeActive; // Whether we are doing OCR in continuous mode
     private SharedPreferences prefs;
@@ -247,15 +273,29 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_main);
 
+        viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
+
+
+        cameraButtonView = findViewById(R.id.camera_button_view);
+
+        resultView = findViewById(R.id.result_view);
+
+
+        statusViewTop = (TextView) findViewById(R.id.status_view_top);
+
         registerForContextMenu(statusViewTop);
         hasSurface = false;
 
         isEngineReady = false;
 
 
-
         // Camera shutter button
         if (DISPLAY_SHUTTER_BUTTON) {
+
+            //TODO replace with butter knife
+            shutterButton = (ShutterButton) findViewById(R.id.shutter_button);
+
+
 
             shutterButton.setOnShutterButtonListener(this);
         }
@@ -267,7 +307,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
         // Camera shutter button
         if (DISPLAY_SHUTTER_BUTTON) {
-            shutterButton = (ShutterButton) findViewById(R.id.shutter_button);
+            // shutterButton = (ShutterButton) findViewById(R.id.shutter_button);
             shutterButton.setOnShutterButtonListener(this);
         }
 
@@ -276,12 +316,17 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         translationView = (TextView) findViewById(R.id.translation_text_view);
         registerForContextMenu(translationView);
 
+        statusViewBottom = (TextView) findViewById(R.id.status_view_bottom);
+        registerForContextMenu(statusViewBottom);
+        statusViewTop = (TextView) findViewById(R.id.status_view_top);
         progressView = (View) findViewById(R.id.indeterminate_progress_indicator_view);
 
         cameraManager = new CameraManager(getApplication());
         viewfinderView.setCameraManager(cameraManager);
 
         // Set listener to change the size of the viewfinder rectangle.
+
+        //Sets adjustable size of the view finder interface.
         viewfinderView.setOnTouchListener(new View.OnTouchListener() {
             int lastX = -1;
             int lastY = -1;
@@ -569,34 +614,34 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         return super.onKeyDown(keyCode, event);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //    MenuInflater inflater = getMenuInflater();
-        //    inflater.inflate(R.menu.options_menu, menu);
-        super.onCreateOptionsMenu(menu);
-        menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
-        menu.add(0, ABOUT_ID, 0, "About").setIcon(android.R.drawable.ic_menu_info_details);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        //    MenuInflater inflater = getMenuInflater();
+//        //    inflater.inflate(R.menu.options_menu, menu);
+//        super.onCreateOptionsMenu(menu);
+//        menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
+//        menu.add(0, ABOUT_ID, 0, "About").setIcon(android.R.drawable.ic_menu_info_details);
+//        return true;
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case SETTINGS_ID: {
-                intent = new Intent().setClass(this, PreferencesActivity.class);
-                startActivity(intent);
-                break;
-            }
-            case ABOUT_ID: {
-                intent = new Intent(this, HelpActivity.class);
-                intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.ABOUT_PAGE);
-                startActivity(intent);
-                break;
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        Intent intent;
+//        switch (item.getItemId()) {
+//            case SETTINGS_ID: {
+//                intent = new Intent().setClass(this, PreferencesActivity.class);
+//                startActivity(intent);
+//                break;
+//            }
+//            case ABOUT_ID: {
+//                intent = new Intent(this, HelpActivity.class);
+//                intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.ABOUT_PAGE);
+//                startActivity(intent);
+//                break;
+//            }
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
         hasSurface = false;
@@ -769,7 +814,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         lastBitmap = ocrResult.getBitmap();
         if (lastBitmap == null) {
             bitmapImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.ic_launcher));
+                    R.mipmap.ic_launcher));
         } else {
             bitmapImageView.setImageBitmap(lastBitmap);
         }
@@ -783,15 +828,15 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
         ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
 
-        TextView translationLanguageLabelTextView = (TextView) findViewById(R.id.translation_language_label_text_view);
-        TextView translationLanguageTextView = (TextView) findViewById(R.id.translation_language_text_view);
+//        TextView translationLanguageLabelTextView = (TextView) findViewById(R.id.translation_language_label_text_view);
+//        TextView translationLanguageTextView = (TextView) findViewById(R.id.translation_language_text_view);
         TextView translationTextView = (TextView) findViewById(R.id.translation_text_view);
         if (isTranslationActive) {
             // Handle translation text fields
-            translationLanguageLabelTextView.setVisibility(View.VISIBLE);
-            translationLanguageTextView.setText(targetLanguageReadable);
-            translationLanguageTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL), Typeface.NORMAL);
-            translationLanguageTextView.setVisibility(View.VISIBLE);
+//            translationLanguageLabelTextView.setVisibility(View.VISIBLE);
+//            translationLanguageTextView.setText(targetLanguageReadable);
+//            translationLanguageTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL), Typeface.NORMAL);
+//            translationLanguageTextView.setVisibility(View.VISIBLE);
 
             // Activate/re-activate the indeterminate progress indicator
             translationTextView.setVisibility(View.GONE);
@@ -799,11 +844,11 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             setProgressBarVisibility(true);
 
             // Get the translation asynchronously
-            new TranslateAsyncTask(this, sourceLanguageCodeTranslation, targetLanguageCodeTranslation,
-                    ocrResult.getText()).execute();
+            // new TranslateAsyncTask(this, sourceLanguageCodeTranslation, targetLanguageCodeTranslation,
+            //   ocrResult.getText()).execute();
         } else {
-            translationLanguageLabelTextView.setVisibility(View.GONE);
-            translationLanguageTextView.setVisibility(View.GONE);
+//            translationLanguageLabelTextView.setVisibility(View.GONE);
+//            translationLanguageTextView.setVisibility(View.GONE);
             translationTextView.setVisibility(View.GONE);
             progressView.setVisibility(View.GONE);
             setProgressBarVisibility(false);
@@ -858,7 +903,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
      *
      * @param obj Metadata for the failed OCR request.
      */
-    void handleOcrContinuousDecode(OcrResultFailure obj) {
+    public void handleOcrContinuousDecode(OcrResultFailure obj) {
         lastResult = null;
         viewfinderView.removeResultText();
 
@@ -991,7 +1036,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
      * Displays an initial message to the user while waiting for the first OCR request to be
      * completed after starting realtime OCR.
      */
-    void setStatusViewForContinuous() {
+    public void setStatusViewForContinuous() {
         viewfinderView.removeResultText();
         if (CONTINUOUS_DISPLAY_METADATA) {
             statusViewBottom.setText("OCR: " + sourceLanguageReadable + " - waiting for OCR...");
@@ -1057,35 +1102,35 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
      * run. The easiest way to do this is to check android:versionCode from the manifest, and compare
      * it to a value stored as a preference.
      */
-    private boolean checkFirstLaunch() {
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
-            int currentVersion = info.versionCode;
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            int lastVersion = prefs.getInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, 0);
-            if (lastVersion == 0) {
-                isFirstLaunch = true;
-            } else {
-                isFirstLaunch = false;
-            }
-            if (currentVersion > lastVersion) {
-
-                // Record the last version for which we last displayed the What's New (Help) page
-                prefs.edit().putInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, currentVersion).commit();
-                Intent intent = new Intent(this, HelpActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-                // Show the default page on a clean install, and the what's new page on an upgrade.
-                String page = lastVersion == 0 ? HelpActivity.DEFAULT_PAGE : HelpActivity.WHATS_NEW_PAGE;
-                intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, page);
-                startActivity(intent);
-                return true;
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.w(TAG, e);
-        }
-        return false;
-    }
+//    private boolean checkFirstLaunch() {
+//        try {
+//            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+//            int currentVersion = info.versionCode;
+//            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//            int lastVersion = prefs.getInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, 0);
+//            if (lastVersion == 0) {
+//                isFirstLaunch = true;
+//            } else {
+//                isFirstLaunch = false;
+//            }
+//            if (currentVersion > lastVersion) {
+//
+//                // Record the last version for which we last displayed the What's New (Help) page
+//                prefs.edit().putInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, currentVersion).commit();
+//                Intent intent = new Intent(this, HelpActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+//
+//                // Show the default page on a clean install, and the what's new page on an upgrade.
+//                String page = lastVersion == 0 ? HelpActivity.DEFAULT_PAGE : HelpActivity.WHATS_NEW_PAGE;
+//                intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, page);
+//                startActivity(intent);
+//                return true;
+//            }
+//        } catch (PackageManager.NameNotFoundException e) {
+//            Log.w(TAG, e);
+//        }
+//        return false;
+//    }
 
     /**
      * Returns a string that represents which OCR engine(s) are currently set to be run.
@@ -1113,12 +1158,12 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
         // Retrieve from preferences, and set in this Activity, the language preferences
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE));
-        setTargetLanguage(prefs.getString(PreferencesActivity.KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE));
+        setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, MainActivity.DEFAULT_SOURCE_LANGUAGE_CODE));
+        setTargetLanguage(prefs.getString(PreferencesActivity.KEY_TARGET_LANGUAGE_PREFERENCE, MainActivity.DEFAULT_TARGET_LANGUAGE_CODE));
         isTranslationActive = prefs.getBoolean(PreferencesActivity.KEY_TOGGLE_TRANSLATION, false);
 
         // Retrieve from preferences, and set in this Activity, the capture mode preference
-        if (prefs.getBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, CaptureActivity.DEFAULT_TOGGLE_CONTINUOUS)) {
+        if (prefs.getBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, MainActivity.DEFAULT_TOGGLE_CONTINUOUS)) {
             isContinuousModeActive = true;
         } else {
             isContinuousModeActive = false;

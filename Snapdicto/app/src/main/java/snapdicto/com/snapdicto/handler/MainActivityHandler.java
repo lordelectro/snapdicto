@@ -23,9 +23,9 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 import snapdicto.com.snapdicto.R;
+import snapdicto.com.snapdicto.UI.DecodeThread;
 import snapdicto.com.snapdicto.UI.MainActivity;
 import snapdicto.com.snapdicto.camera.CameraManager;
-import snapdicto.com.snapdicto.UI.DecodeThread;
 import snapdicto.com.snapdicto.ocrlib.OcrResult;
 import snapdicto.com.snapdicto.ocrlib.OcrResultFailure;
 
@@ -34,10 +34,10 @@ import snapdicto.com.snapdicto.ocrlib.OcrResultFailure;
  *
  * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing/
  */
-final class MainActivityHandler extends Handler {
+public final class MainActivityHandler extends Handler {
 
   private static final String TAG = MainActivityHandler.class.getSimpleName();
-  
+
   private final MainActivity activity;
   private final DecodeThread decodeThread;
   private static State state;
@@ -52,45 +52,45 @@ final class MainActivityHandler extends Handler {
     DONE
   }
 
-  MainActivityHandler(MainActivity activity, CameraManager cameraManager, boolean isContinuousModeActive) {
+  public MainActivityHandler(MainActivity activity, CameraManager cameraManager, boolean isContinuousModeActive) {
     this.activity = activity;
     this.cameraManager = cameraManager;
 
     // Start ourselves capturing previews (and decoding if using continuous recognition mode).
     cameraManager.startPreview();
-    
+
     decodeThread = new DecodeThread(activity);
     decodeThread.start();
-    
+
     if (isContinuousModeActive) {
       state = State.CONTINUOUS;
 
       // Show the shutter and torch buttons
       activity.setButtonVisibility(true);
-      
+
       // Display a "be patient" message while first recognition request is running
       activity.setStatusViewForContinuous();
-      
+
       restartOcrPreviewAndDecode();
     } else {
       state = State.SUCCESS;
-      
+
       // Show the shutter and torch buttons
       activity.setButtonVisibility(true);
-      
+
       restartOcrPreview();
     }
   }
 
   @Override
   public void handleMessage(Message message) {
-    
+
     switch (message.what) {
       case R.id.restart_preview:
         restartOcrPreview();
         break;
       case R.id.ocr_continuous_decode_failed:
-        DecodeHandler.resetDecodeState();        
+        DecodeHandler.resetDecodeState();
         try {
           activity.handleOcrContinuousDecode((OcrResultFailure) message.obj);
         } catch (NullPointerException e) {
@@ -125,23 +125,23 @@ final class MainActivityHandler extends Handler {
         break;
     }
   }
-  
-  void stop() {
+
+  public void stop() {
     // TODO See if this should be done by sending a quit message to decodeHandler as is done
     // below in quitSynchronously().
-    
+
     Log.d(TAG, "Setting state to CONTINUOUS_PAUSED.");
     state = State.CONTINUOUS_PAUSED;
     removeMessages(R.id.ocr_continuous_decode);
     removeMessages(R.id.ocr_decode);
     removeMessages(R.id.ocr_continuous_decode_failed);
     removeMessages(R.id.ocr_continuous_decode_succeeded); // TODO are these removeMessages() calls doing anything?
-    
+
     // Freeze the view displayed to the user.
 //    CameraManager.get().stopPreview();
   }
-  
-  void resetState() {
+
+  public void resetState() {
     //Log.d(TAG, "in restart()");
     if (state == State.CONTINUOUS_PAUSED) {
       Log.d(TAG, "Setting state to CONTINUOUS");
@@ -149,8 +149,8 @@ final class MainActivityHandler extends Handler {
       restartOcrPreviewAndDecode();
     }
   }
-  
-  void quitSynchronously() {    
+
+  public void quitSynchronously() {
     state = State.DONE;
     if (cameraManager != null) {
       cameraManager.stopPreview();
@@ -158,7 +158,7 @@ final class MainActivityHandler extends Handler {
     //Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
     try {
       //quit.sendToTarget(); // This always gives "sending message to a Handler on a dead thread"
-      
+
       // Wait at most half a second; should be enough time, and onPause() will timeout quickly
       decodeThread.join(500L);
     } catch (InterruptedException e) {
@@ -180,52 +180,52 @@ final class MainActivityHandler extends Handler {
   /**
    *  Start the preview, but don't try to OCR anything until the user presses the shutter button.
    */
-  private void restartOcrPreview() {    
+  private void restartOcrPreview() {
     // Display the shutter and torch buttons
     activity.setButtonVisibility(true);
 
     if (state == State.SUCCESS) {
       state = State.PREVIEW;
-      
+
       // Draw the viewfinder.
       activity.drawViewfinder();
     }
   }
-  
+
   /**
    *  Send a decode request for realtime OCR mode
    */
   private void restartOcrPreviewAndDecode() {
     // Continue capturing camera frames
     cameraManager.startPreview();
-    
+
     // Continue requesting decode of images
     cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.ocr_continuous_decode);
-    activity.drawViewfinder();    
+    activity.drawViewfinder();
   }
 
   /**
-   * Request OCR on the current preview frame. 
+   * Request OCR on the current preview frame.
    */
   private void ocrDecode() {
     state = State.PREVIEW_PAUSED;
     cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.ocr_decode);
   }
-  
+
   /**
    * Request OCR when the hardware shutter button is clicked.
    */
-  void hardwareShutterButtonClick() {
+  public void hardwareShutterButtonClick() {
     // Ensure that we're not in continuous recognition mode
     if (state == State.PREVIEW) {
       ocrDecode();
     }
   }
-  
+
   /**
    * Request OCR when the on-screen shutter button is clicked.
    */
-  void shutterButtonClick() {
+  public void shutterButtonClick() {
     // Disable further clicks on this button until OCR request is finished
     activity.setShutterButtonClickable(false);
     ocrDecode();
