@@ -25,6 +25,7 @@ import android.widget.Toast;
 import snapdicto.com.snapdicto.R;
 import snapdicto.com.snapdicto.UI.MainActivity;
 import snapdicto.com.snapdicto.camera.CameraManager;
+import snapdicto.com.snapdicto.UI.DecodeThread;
 
 /**
  * This class handles all the messaging which comprises the state machine for capture.

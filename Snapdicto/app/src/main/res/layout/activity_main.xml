@@ -9,6 +9,13 @@
         android:layout_height="fill_parent"
         android:layout_centerInParent="true"/>
 
+    <!--Adjustable Layout that focuses on the captured word." -->
+    <snapdicto.com.snapdicto.UI.ViewfinderView
+        android:id="@+id/viewfinder_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#0000"/>
+
     <!-- Layout for Results after image processing." -->
     <LinearLayout android:id="@+id/result_view"
         android:orientation="vertical"
