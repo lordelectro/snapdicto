@@ -7,11 +7,13 @@
 
  # Appreciation
 
- ZXing authors at: https://github.com/zxing/zxing
+  - ZXing authors at: https://github.com/zxing/zxing
 
- Android-OCR library using tesseract (a Google Text Recognition API).
+  - Android-OCR library using tesseract (a Google Text Recognition API).
 
-  & Robert Theis's libraries at: https://github.com/rmtheis
+  - Robert Theis's libraries at: https://github.com/rmtheis
+
+  - JSOUP at (https://jsoup.org/) Web API used to fetch data/ word meaning from the website.
 
 
  # Note:
