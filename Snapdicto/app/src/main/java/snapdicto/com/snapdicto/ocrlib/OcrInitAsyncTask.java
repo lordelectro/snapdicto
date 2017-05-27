@@ -48,7 +48,7 @@ import snapdicto.com.snapdicto.UI.MainActivity;
  * Installs the language data required for OCR, and initializes the OCR engine using a background 
  * thread.
  */
-final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
+public final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   private static final String TAG = OcrInitAsyncTask.class.getSimpleName();
 
   /** Suffixes of required data files for Cube. */
@@ -91,9 +91,9 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
    * @param ocrEngineMode
    *          Whether to use Tesseract, Cube, or both
    */
-  OcrInitAsyncTask(MainActivity activity, TessBaseAPI baseApi, ProgressDialog dialog,
-                   ProgressDialog indeterminateDialog, String languageCode, String languageName,
-                   int ocrEngineMode) {
+  public OcrInitAsyncTask(MainActivity activity, TessBaseAPI baseApi, ProgressDialog dialog,
+                          ProgressDialog indeterminateDialog, String languageCode, String languageName,
+                          int ocrEngineMode) {
     this.activity = activity;
     this.context = activity.getBaseContext();
     this.baseApi = baseApi;

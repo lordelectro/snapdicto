@@ -21,9 +21,8 @@ import android.os.Handler;
 import android.os.Looper;
 
 import java.util.concurrent.CountDownLatch;
-import snapdicto.com.snapdicto.handler.DecodeHandler;
 
-import snapdicto.com.snapdicto.UI.MainActivity;
+import snapdicto.com.snapdicto.handler.DecodeHandler;
 
 /**
  * This thread does all the heavy lifting of decoding the images.
@@ -36,7 +35,7 @@ public final class DecodeThread extends Thread {
   private Handler handler;
   private final CountDownLatch handlerInitLatch;
 
-  DecodeThread(MainActivity activity) {
+  public DecodeThread(MainActivity activity) {
     this.activity = activity;
     handlerInitLatch = new CountDownLatch(1);
   }

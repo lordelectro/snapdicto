@@ -36,7 +36,7 @@ import snapdicto.com.snapdicto.UI.MainActivity;
  * Class to send OCR requests to the OCR engine in a separate thread, send a success/failure message,
  * and dismiss the indeterminate progress dialog box. Used for non-continuous mode OCR only.
  */
-final class OcrRecognizeAsyncTask extends AsyncTask<Void, Void, Boolean> {
+public final class OcrRecognizeAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
   //  private static final boolean PERFORM_FISHER_THRESHOLDING = false; 
   //  private static final boolean PERFORM_OTSU_THRESHOLDING = false; 
@@ -50,7 +50,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<Void, Void, Boolean> {
   private OcrResult ocrResult;
   private long timeRequired;
 
-  OcrRecognizeAsyncTask(MainActivity activity, TessBaseAPI baseApi, byte[] data, int width, int height) {
+  public OcrRecognizeAsyncTask(MainActivity activity, TessBaseAPI baseApi, byte[] data, int width, int height) {
     this.activity = activity;
     this.baseApi = baseApi;
     this.data = data;

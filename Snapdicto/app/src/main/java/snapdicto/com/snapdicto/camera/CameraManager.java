@@ -29,7 +29,7 @@ import android.view.SurfaceHolder;
 import java.io.IOException;
 
 import snapdicto.com.snapdicto.activities.PreferencesActivity;
-import snapdicto.com.snapdicto.imageprocessing.PlanarYUVLuminanceSource;
+import snapdicto.com.snapdicto.imageprocessing.source.PlanarYUVLuminanceSource;
 
 
 /**

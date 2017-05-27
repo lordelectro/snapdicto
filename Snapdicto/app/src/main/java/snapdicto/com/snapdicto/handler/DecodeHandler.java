@@ -31,9 +31,10 @@ import snapdicto.com.snapdicto.UI.BeepManager;
 import snapdicto.com.snapdicto.R;
 import snapdicto.com.snapdicto.UI.MainActivity;
 import snapdicto.com.snapdicto.UI.ViewfinderView;
-import snapdicto.com.snapdicto.imageprocessing.PlanarYUVLuminanceSource;
+import snapdicto.com.snapdicto.imageprocessing.source.PlanarYUVLuminanceSource;
 import snapdicto.com.snapdicto.ocrlib.OcrResult;
 import snapdicto.com.snapdicto.ocrlib.OcrResultFailure;
+import snapdicto.com.snapdicto.ocrlib.OcrRecognizeAsyncTask;
 
 /**
  * Class to send bitmap data for OCR.
