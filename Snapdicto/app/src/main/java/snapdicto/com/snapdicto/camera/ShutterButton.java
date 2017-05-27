@@ -2,8 +2,15 @@ package snapdicto.com.snapdicto.camera;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SoundEffectConstants;
 import android.widget.ImageView;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
+
 /**
  * On-screen shutter button that can call a delegate when the
  * pressed state changes.
@@ -83,7 +90,13 @@ public class ShutterButton extends android.support.v7.widget.AppCompatImageView 
 			 mListener.onShutterButtonClick(this);
 		 }
 		 return result;
+
+
 	 }
+
+
+
+
 
 
 }

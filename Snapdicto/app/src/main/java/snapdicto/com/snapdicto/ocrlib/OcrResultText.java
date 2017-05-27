@@ -95,4 +95,6 @@ public final class OcrResultText {
   public String toString() {
     return text + " " + meanConfidence;
   }
+
+
 }
