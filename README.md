@@ -5,6 +5,18 @@
  Simply scan the word and get it meaning or definition. (FAST)
 
 
+ # Sample Images of the App
+
+ Image 1:
+
+ ![img_20170527_135902](https://cloud.githubusercontent.com/assets/10918593/26521057/f0ba0910-42e7-11e7-92c7-591a5ea4a3b5.jpg)
+
+ 
+ Image 2:
+
+ ![img_20170527_140115](https://cloud.githubusercontent.com/assets/10918593/26521073/33ae6f90-42e8-11e7-96fb-799445498f37.jpg)
+
+
  # Appreciation
 
   - ZXing authors at: https://github.com/zxing/zxing
