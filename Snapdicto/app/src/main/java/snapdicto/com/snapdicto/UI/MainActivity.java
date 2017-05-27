@@ -73,7 +73,7 @@ import snapdicto.com.snapdicto.ocrlib.OcrResult;
 import snapdicto.com.snapdicto.ocrlib.OcrResultFailure;
 import snapdicto.com.snapdicto.ocrlib.OcrResultText;
 
-
+import static android.R.id.message;
 
 
 /**
@@ -203,10 +203,10 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     public static final boolean DEFAULT_DISABLE_CONTINUOUS_FOCUS = true;
 
     /** Whether to beep by default when the shutter button is pressed. */
-    public static final boolean DEFAULT_TOGGLE_BEEP = false;
+    public static final boolean DEFAULT_TOGGLE_BEEP = true;
 
     /** Whether to initially show a looping, real-time OCR display. */
-    public static final boolean DEFAULT_TOGGLE_CONTINUOUS = false;
+    public static final boolean DEFAULT_TOGGLE_CONTINUOUS = true;
 
     /** Whether to initially reverse the image returned by the camera. */
     public static final boolean DEFAULT_TOGGLE_REVERSED_IMAGE = false;
@@ -215,7 +215,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     public static final boolean DEFAULT_TOGGLE_TRANSLATION = true;
 
     /** Whether the light should be initially activated by default. */
-    public static final boolean DEFAULT_TOGGLE_LIGHT = false;
+    public static final boolean DEFAULT_TOGGLE_LIGHT = true;
 
 
     /** Flag to display the real-time recognition results at the top of the scanning screen. */
@@ -223,6 +223,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
     /** Flag to display recognition-related statistics on the scanning screen. */
     private static final boolean CONTINUOUS_DISPLAY_METADATA = true;
+
+
 
 
     /** Languages for which Cube data is available. */
@@ -287,6 +289,12 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         hasSurface = false;
 
         isEngineReady = false;
+
+
+        //DecodeHandler.resetDecodeState();
+        //lastResult = ocrResult;
+
+        //callme();
 
 
         // Camera shutter button
@@ -409,6 +417,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
         isEngineReady = false;
     }
+
 
     @Override
     protected void onResume() {
@@ -856,6 +865,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         return true;
     }
 
+
+
     /**
      * Displays information relating to the results of a successful real-time OCR request.
      *
@@ -918,6 +929,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             statusViewBottom.setText(cs);
         }
     }
+
+
 
     /**
      * Given either a Spannable String or a regular String and a token, apply

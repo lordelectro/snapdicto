@@ -51,6 +51,7 @@
                     android:adjustViewBounds="true"
                     android:scaleType="centerInside"/>
 
+                <!-- Layout for OSR Source language." -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"

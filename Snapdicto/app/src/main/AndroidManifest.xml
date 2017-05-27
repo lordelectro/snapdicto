@@ -47,4 +47,6 @@
         </activity>
     </application>
 
+    <activity android:name=".activities.PreferencesActivity" />
+
 </manifest>
