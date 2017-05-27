@@ -123,10 +123,6 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private String targetLanguageCodeTranslation; // ISO 639-1 language code
     private String targetLanguageReadable; // Language name, for example, "English"
     private int pageSegmentationMode = TessBaseAPI.PageSegMode.PSM_AUTO_OSD;
-    //    private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-
-//    private ShutterButton shutterButton;
-
 
 
     public Handler getHandler() {
@@ -154,9 +150,6 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
     @Bind(R.id.status_view_top)
     TextView statusViewTop;
-
-//    @Bind(R.id.ocr_dicto_text_view)
-//    TextView statusViewMeaning;
 
 
 
