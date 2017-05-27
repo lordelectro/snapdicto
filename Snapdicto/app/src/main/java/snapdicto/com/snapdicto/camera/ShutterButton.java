@@ -19,12 +19,13 @@ public class ShutterButton extends android.support.v7.widget.AppCompatImageView 
 		 *
 		 * @param b The ShutterButton that was pressed.
 		 */
-
+		void onShutterButtonFocus(ShutterButton b, boolean pressed);
 
 		void onShutterButtonClick(ShutterButton b);
 	}
 
 	private OnShutterButtonListener mListener;
+	private boolean mOldPressed;
 
 
 	public ShutterButton(Context context) {
@@ -45,6 +46,34 @@ public class ShutterButton extends android.support.v7.widget.AppCompatImageView 
 	}
 
 
+	/**
+	 * Hook into the drawable state changing to get changes to isPressed -- the
+	 * onPressed listener doesn't always get called when the pressed state
+	 * changes.
+	 */
+	@Override
+	protected void drawableStateChanged() {
+		super .drawableStateChanged();
+		final boolean pressed = isPressed();
+		if (pressed != mOldPressed) {
+			if (!pressed) {
+				post(new Runnable() {
+					public void run() {
+						callShutterButtonFocus(pressed);
+					}
+				});
+			} else {
+				callShutterButtonFocus(pressed);
+			}
+			mOldPressed = pressed;
+		}
+	}
+
+	private void callShutterButtonFocus(boolean pressed) {
+		if (mListener != null) {
+			mListener.onShutterButtonFocus(this , pressed);
+		}
+	}
 	 //Performs Click on Success.
 	 @Override
 	 public boolean performClick() {
@@ -55,4 +84,6 @@ public class ShutterButton extends android.support.v7.widget.AppCompatImageView 
 		 }
 		 return result;
 	 }
+
+
 }

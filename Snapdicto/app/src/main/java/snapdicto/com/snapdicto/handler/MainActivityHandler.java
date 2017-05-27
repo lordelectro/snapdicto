@@ -26,6 +26,8 @@ import snapdicto.com.snapdicto.R;
 import snapdicto.com.snapdicto.UI.MainActivity;
 import snapdicto.com.snapdicto.camera.CameraManager;
 import snapdicto.com.snapdicto.UI.DecodeThread;
+import snapdicto.com.snapdicto.ocrlib.OcrResult;
+import snapdicto.com.snapdicto.ocrlib.OcrResultFailure;
 
 /**
  * This class handles all the messaging which comprises the state machine for capture.

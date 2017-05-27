@@ -129,7 +129,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     // Example Tesseract data filename: "eng.traineddata"
     String destinationFilenameBase = languageCode + ".traineddata";
     boolean isCubeSupported = false;
-    for (String s : CaptureActivity.CUBE_SUPPORTED_LANGUAGES) {
+    for (String s : MainActivity.CUBE_SUPPORTED_LANGUAGES) {
       if (s.equals(languageCode)) {
         isCubeSupported = true;   
       }
@@ -329,7 +329,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   private boolean downloadFile(String sourceFilenameBase, File destinationFile)
       throws IOException {
     try {
-      return downloadGzippedFileHttp(new URL(CaptureActivity.DOWNLOAD_BASE + sourceFilenameBase +
+      return downloadGzippedFileHttp(new URL(MainActivity.DOWNLOAD_BASE + sourceFilenameBase +
           ".gz"), 
           destinationFile);
     } catch (MalformedURLException e) {

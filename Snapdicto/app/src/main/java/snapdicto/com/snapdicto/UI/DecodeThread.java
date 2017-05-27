@@ -41,7 +41,7 @@ public final class DecodeThread extends Thread {
     handlerInitLatch = new CountDownLatch(1);
   }
 
-  Handler getHandler() {
+  public Handler getHandler() {
     try {
       handlerInitLatch.await();
     } catch (InterruptedException ie) {

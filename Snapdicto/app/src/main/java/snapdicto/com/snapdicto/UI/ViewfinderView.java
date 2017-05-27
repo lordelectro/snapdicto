@@ -44,13 +44,13 @@ public final class ViewfinderView extends View {
   //private static final long ANIMATION_DELAY = 80L;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetRegions(). */
-  static final boolean DRAW_REGION_BOXES = false;
+  public static final boolean DRAW_REGION_BOXES = false;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetTextlines(). */
-  static final boolean DRAW_TEXTLINE_BOXES = true;
+  public static final boolean DRAW_TEXTLINE_BOXES = true;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetStrips(). */
-  static final boolean DRAW_STRIP_BOXES = false;
+  public static final boolean DRAW_STRIP_BOXES = false;
 
   /** Flag to draw boxes representing the results from TessBaseAPI::GetWords(). */
   static final boolean DRAW_WORD_BOXES = true;

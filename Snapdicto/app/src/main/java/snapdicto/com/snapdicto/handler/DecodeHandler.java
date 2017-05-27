@@ -30,6 +30,7 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 import snapdicto.com.snapdicto.UI.BeepManager;
 import snapdicto.com.snapdicto.R;
 import snapdicto.com.snapdicto.UI.MainActivity;
+import snapdicto.com.snapdicto.UI.ViewfinderView;
 import snapdicto.com.snapdicto.imageprocessing.PlanarYUVLuminanceSource;
 import snapdicto.com.snapdicto.ocrlib.OcrResult;
 import snapdicto.com.snapdicto.ocrlib.OcrResultFailure;
@@ -79,7 +80,7 @@ public final class DecodeHandler extends Handler {
     }
   }
 
-  static void resetDecodeState() {
+  public static void resetDecodeState() {
     isDecodePending = false;
   }
 
