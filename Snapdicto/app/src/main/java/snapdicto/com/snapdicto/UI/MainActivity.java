@@ -1,4 +1,5 @@
 /*
+ *
  * Copyright (C) 2008 ZXing authors
  * Copyright 2011 Robert Theis
  *
@@ -20,16 +21,23 @@ package snapdicto.com.snapdicto.UI;
 import android.app.Activity;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.IOException;
+
 import butterknife.Bind;
 import snapdicto.com.snapdicto.R;
 import snapdicto.com.snapdicto.camera.ShutterButton;
+import snapdicto.com.snapdicto.camera.CameraManager;
+
 
 
 /**
@@ -39,8 +47,10 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         ShutterButton.OnShutterButtonListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private MainActivityHandler handler;
     private boolean hasSurface;
     private boolean isEngineReady;
+    private CameraManager cameraManager;
     /* USING butter knife Dependency INJECTION */
     @Bind(R.id.shutter_button)
     ShutterButton shutterButton;
@@ -52,6 +62,13 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     @Bind(R.id.status_view_top)
     TextView statusViewTop;
 
+    MainActivityHandler getHandler() {
+        return handler;
+    }
+
+    CameraManager getCameraManager() {
+        return cameraManager;
+    }
 
     /** Flag to enable display of the on-screen shutter button. */
     private static final boolean DISPLAY_SHUTTER_BUTTON = true;
@@ -95,15 +112,53 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
     }
 
+    /** Initializes the camera and starts the handler to begin previewing. */
+    private void initCamera(SurfaceHolder surfaceHolder) {
+        Log.d(TAG, "initCamera()");
+        if (surfaceHolder == null) {
+            throw new IllegalStateException("No SurfaceHolder provided");
+        }
+        try {
+
+            // Open and initialize the camera
+            cameraManager.openDriver(surfaceHolder);
+
+            // Creating the handler starts the preview, which can also throw a RuntimeException.
+            handler = new MainActivityHandler(this, cameraManager, isContinuousModeActive);
+
+        } catch (IOException ioe) {
+            showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
+        } catch (RuntimeException e) {
+            // Barcode Scanner has seen crashes in the wild of this variety:
+            // java.?lang.?RuntimeException: Fail to connect to camera service
+            showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (handler != null) {
+            handler.quitSynchronously();
+        }
+
+        // Stop using the camera, to avoid conflicting with other camera-based apps
+        cameraManager.closeDriver();
+
+        if (!hasSurface) {
+            SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
+            SurfaceHolder surfaceHolder = surfaceView.getHolder();
+            surfaceHolder.removeCallback(this);
+        }
+        super.onPause();
+    }
+
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-
-    }
+    public void surfaceDestroyed(SurfaceHolder holder) { hasSurface = false; }
 
     @Override
     public void onShutterButtonClick(ShutterButton b) {
