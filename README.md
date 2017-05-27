@@ -1,4 +1,4 @@
-# snapdicto v1.0
+# Snapdicto v1.0
 
  This application eliminates the need to type text in any search engine for a dictionary word meaning.
 
