@@ -33,6 +33,13 @@
 
   - ResearchWorks: This will provide a page of summarised research works of a sentence/word recognized.
 
+  AutoMode:
+
+  - This will be selected for advanced automode- i.e it will use image prrocessing skills/needs to differentiate recognized words.
+    i.e it will learn to understand and differentiate between Weblinks, Character and Dictionary works automatically. Plus others.
+
+    Once it learns, then the effect of retrieved works will change.  
+
  # Our Trello Board.
 
  This Helps us in collaboration and assigning tasks to group members. (plus due dates.)
