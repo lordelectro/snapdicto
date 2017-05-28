@@ -17,6 +17,28 @@
  ![img_20170527_140115](https://cloud.githubusercontent.com/assets/10918593/26521073/33ae6f90-42e8-11e7-96fb-799445498f37.jpg)
 
 
+ # To Do: (Part of Our Future Objective)
+
+ Building of an Option-Menu where the user can select his/her Recognition type.(What he wants the app to recognize). i.e. this will affect the application's flow: 
+
+ For example:
+
+  - Dictionary: This retrieves dictionary meaning of the word recognized.
+
+  - Theasaurus: This retrieves suggested words for the recognized word.
+
+  - Weblinks: This will prompt opening up a web-browser of the recognized weblink.
+
+  - Character: This will retrieve Wikipedia information of a recognized character or personnel.
+
+  - ResearchWorks: This will provide a page of summarised research works of a sentence/word recognized.
+
+ # Our Trello Board.
+
+ This Helps us in collaboration and assigning tasks to group members. (plus due dates.)
+
+ https://trello.com/b/2NMc4Jhx/snapdicto
+
  # Appreciation
 
   - ZXing authors at: https://github.com/zxing/zxing
