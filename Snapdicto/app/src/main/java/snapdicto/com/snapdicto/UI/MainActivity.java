@@ -754,6 +754,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
      * @return True if a non-null result was received for OCR
      */
     public boolean handleOcrDecode(OcrResult ocrResult) {
+        String waiting = "Retrieving Meaning ...";
         lastResult = ocrResult;
         //Testing if there is a result retrieved. or No result
         Log.d("ocrResult", ocrResult.getText());
@@ -794,6 +795,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
         TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
         ocrResultTextView.setText(ocrResult.getText());
+        statusViewMeaning.setText(waiting);
 
         //Testing what display has been displayed to user
         Log.d("ocrResult_Test View", ocrResult.getText());
@@ -840,9 +842,9 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             @Override
             public void run() {
                 final StringBuilder builder = new StringBuilder();
-
                 lastResult = ocrResult;
                 String fetchedresult = ocrResult.getText().toString();
+                //final String retrieval = "Retrieving Meaning .... ";
 
                 try {
 
@@ -867,6 +869,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
                 } catch (IOException e) {
                     //e.printStackTrace();
 
+                    Log.w("Error:" , e.getMessage());
                     //Display error.
                     builder.append("Error :").append(e.getMessage()).append("\n");
 
@@ -923,8 +926,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             statusViewTop.setBackgroundResource(R.color.status_top_text_background);
 
             statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
-
-            Log.i("Recognized Text:", statusViewTop.toString());
+            String RecognizedView = ocrResult.getText();
+            Log.i("Recognized Text:", RecognizedView);
         }
 
         if (CONTINUOUS_DISPLAY_METADATA) {
@@ -934,7 +937,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             statusViewBottom.setText("OCR: " + sourceLanguageReadable + " - Mean confidence: " +
                     meanConfidence.toString() + " - Time required: " + recognitionTimeRequired + " ms");
 
-            Log.i("Meanconfidence:", statusViewBottom.toString());
+            String meanconfidence = meanConfidence.toString();
+            Log.i("Meanconfidence:", meanconfidence);
 
         }
     }
