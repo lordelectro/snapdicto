@@ -52,6 +52,8 @@
 
   - Android-OCR library using tesseract (a Google Text Recognition API).
 
+  - Tessract library at https://github.com/tesseract-ocr/
+
   - Robert Theis's libraries at: https://github.com/rmtheis
 
   - JSOUP at (https://jsoup.org/) Web API used to fetch data/ word meaning from the website.

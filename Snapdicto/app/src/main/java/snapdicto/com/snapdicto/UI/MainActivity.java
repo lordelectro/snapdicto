@@ -169,6 +169,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
     /** The default OCR engine to use. */
     public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
+    //public static final String DEFAULT_OCR_ENGINE_MODE = "Both";
 
     /** The default page segmentation mode to use. */
     public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Auto";
@@ -220,7 +221,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     public static final String DOWNLOAD_BASE = "http://tesseract-ocr.googlecode.com/files/";
 
     /** Download filename for orientation and script detection (OSD) data. */
-    public static final String OSD_FILENAME = "tesseract-ocr-3.01.osd.tar";
+    public static final String OSD_FILENAME = "tesseract-ocr-3.02.osd.tar";
 
     /** Destination filename for orientation and script detection (OSD) data. */
     public static final String OSD_FILENAME_BASE = "osd.traineddata";
@@ -230,6 +231,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
 
     private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
+    //private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED;
     private String characterBlacklist;
     private String characterWhitelist;
     // private ShutterButton shutterButton;
@@ -753,9 +755,14 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
      */
     public boolean handleOcrDecode(OcrResult ocrResult) {
         lastResult = ocrResult;
-
+        //Testing if there is a result retrieved. or No result
+        Log.d("ocrResult", ocrResult.getText());
         // Test whether the result is null
         if (ocrResult.getText() == null || ocrResult.getText().equals("")) {
+
+            //Display warning information
+            Log.w("No-OCR-Result:",ocrResult.getText());
+            //if there is no result: toast.
             Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.TOP, 0, 0);
             toast.show();
@@ -770,6 +777,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         viewfinderView.setVisibility(View.GONE);
         resultView.setVisibility(View.VISIBLE);
 
+        //display translated image
         ImageView bitmapImageView = (ImageView) findViewById(R.id.image_view);
         lastBitmap = ocrResult.getBitmap();
         if (lastBitmap == null) {
@@ -780,10 +788,15 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         }
 
         // Display the recognized text returned from recognition of image to text
+
         TextView sourceLanguageTextView = (TextView) findViewById(R.id.source_language_text_view);
         sourceLanguageTextView.setText(sourceLanguageReadable);
+
         TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
         ocrResultTextView.setText(ocrResult.getText());
+
+        //Testing what display has been displayed to user
+        Log.d("ocrResult_Test View", ocrResult.getText());
         // Crudely scale betweeen 22 and 32 -- bigger font for shorter text
         int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
         ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
@@ -866,6 +879,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
                         //Append Dictionary meaning of returned result.
                         statusViewMeaning.setText(builder.toString());
+
+                        Log.i("Success:" , "Result successfully retrieved");
 
                     }
                 });
