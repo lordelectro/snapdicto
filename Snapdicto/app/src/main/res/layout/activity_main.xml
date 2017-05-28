@@ -104,6 +104,15 @@
                         android:paddingLeft="12dip"
                         android:autoLink="web"/>
 
+                    <TextView android:id="@+id/ocr_othermeaning_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/result_text"
+                        android:textColorLink="@color/result_text"
+                        android:textSize="22sp"
+                        android:paddingLeft="12dip"
+                        android:autoLink="web"/>
+
                     <TextView android:id="@+id/translation_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -178,6 +187,8 @@
             android:textSize="14sp"
             android:autoLink="web"
             android:clickable="true" />
+
+
 
     </RelativeLayout>
 

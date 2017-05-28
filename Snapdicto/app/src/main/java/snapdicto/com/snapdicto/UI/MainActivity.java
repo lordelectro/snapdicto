@@ -106,6 +106,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private SurfaceHolder surfaceHolder;
     private TextView statusViewBottom;
     private TextView statusViewMeaning;
+    private TextView statusViewOtherWord;
     //private TextView statusViewTop;
     private TextView ocrResultView;
     private TextView translationView;
@@ -260,6 +261,10 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         //stating the view to display meaning.
         statusViewMeaning = (TextView) findViewById(R.id.ocr_dicto_text_view);
         registerForContextMenu(statusViewMeaning);
+
+        //stating the view to display other word to mean sameword.
+        statusViewOtherWord = (TextView) findViewById(R.id.ocr_othermeaning_text_view);
+        registerForContextMenu(statusViewOtherWord);
 
 
         cameraButtonView = findViewById(R.id.camera_button_view);
@@ -471,6 +476,12 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             handleOcrDecode(lastResult);
             //get dictionary meaning of text
             getmeaning(lastResult);
+            //getothermeaning(lastResult);
+
+            if(lastResult != null && statusViewMeaning.getText().toString() != null){
+                getothermeaning(lastResult);
+            }
+           //getothermeaning(lastResult);
 
         } else {
             Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
@@ -755,6 +766,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
      */
     public boolean handleOcrDecode(OcrResult ocrResult) {
         String waiting = "Retrieving Meaning ...";
+        String waiting_other_word = "Retrieving Other Word ...";
         lastResult = ocrResult;
         //Testing if there is a result retrieved. or No result
         Log.d("ocrResult", ocrResult.getText());
@@ -796,6 +808,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
         ocrResultTextView.setText(ocrResult.getText());
         statusViewMeaning.setText(waiting);
+
+        statusViewOtherWord.setText(waiting_other_word);
 
         //Testing what display has been displayed to user
         Log.d("ocrResult_Test View", ocrResult.getText());
@@ -851,6 +865,9 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
                     //Using Jsoup Library for WebScripping for information.
                     Document doc = Jsoup.connect("http://www.dictionary.com/browse/"+fetchedresult).get();
 
+                    //Using Jsoup Library for WebScripping for other word.
+                    Document docOtherWord = Jsoup.connect("http://www.thesaurus.com/browse/"+fetchedresult).get();
+
                     //Testing Whether data is returned.
                     Log.d("Returned Data or Result", fetchedresult);
 
@@ -858,12 +875,17 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
                     //selecting a specific div to be fetched
                     String Element = doc.select("div.def-content").first().text();
 
+                    //String Element = doc.select("div.relevancy-list.ul.li.common-class").first().text();
+                    //String ElementOtherWord = docOtherWord.select("a.common-word").first().text();
+
+
                     //Testing the value of Element returned.
                     Log.d("Hello", Element);
 
                     //String Builder to append the String.
 
                     builder.append(Element);
+                    //builder.append(ElementOtherWord);
 
 
                 } catch (IOException e) {
@@ -883,7 +905,11 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
                         //Append Dictionary meaning of returned result.
                         statusViewMeaning.setText(builder.toString());
 
+                        //Append Dictionary meaning of returned result.
+                        //statusViewOtherWord.setText(builder.toString());
+
                         Log.i("Success:" , "Result successfully retrieved");
+
 
                     }
                 });
@@ -892,6 +918,95 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
 
 
     }
+
+
+
+    //Retrieving Dictionary Meaning of the Result got from the image.
+    private void getothermeaning(final OcrResult ocrResult) {
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final StringBuilder builder = new StringBuilder();
+                lastResult = ocrResult;
+                String fetchedresult = ocrResult.getText().toString();
+                //final String retrieval = "Retrieving Meaning .... ";
+//
+                if(fetchedresult == null){
+                    String found = "No Other Word Found";
+                    builder.append(found);
+
+                }
+
+                try {
+
+
+
+
+                    if(fetchedresult != null) {
+
+                        //Using Jsoup Library for WebScripping for information.
+                        Document doc = Jsoup.connect("http://www.thesaurus.com/browse/"+fetchedresult).get();
+
+                        //Testing Whether data is returned.
+                        Log.d("Returned Data or Result", fetchedresult);
+                        //selecting a specific div to be fetched
+                        //String Element = doc.select("div.relevancy-list.ul.li.common-class").first().text();
+                        String Element = doc.select("a.common-word").first().text();
+
+
+                        //Testing the value of Element returned.
+                        Log.d("Value returned", Element);
+
+
+                        //String Builder to append the String.
+
+                        //builder.append(Element);
+
+                        String s = Element.substring(0, Element.length() - 4);
+                        builder.append(s);
+
+                    }else{
+                        String found = "No Other Word Found";
+                        builder.append(found);
+
+                    }
+
+
+
+                } catch (IOException e) {
+                    //e.printStackTrace();
+
+                    Log.w("Error:" , e.getMessage());
+                    //Display error.
+                    builder.append("Error :").append(e.getMessage()).append("\n");
+
+
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        //Append Dictionary meaning of returned result.
+                        statusViewOtherWord.setText("\n" + "Other Word:" +  builder.toString());
+
+
+
+                        Log.i("Success:" , "Other Word successfully retrieved");
+
+                    }
+                });
+            }
+        }).start();
+
+
+    }
+
+
+
+
 
 
 
