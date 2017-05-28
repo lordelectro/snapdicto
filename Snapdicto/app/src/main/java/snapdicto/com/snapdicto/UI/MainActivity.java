@@ -923,6 +923,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             statusViewTop.setBackgroundResource(R.color.status_top_text_background);
 
             statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
+
+            Log.i("Recognized Text:", statusViewTop.toString());
         }
 
         if (CONTINUOUS_DISPLAY_METADATA) {
@@ -931,6 +933,9 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             statusViewBottom.setTextSize(14);
             statusViewBottom.setText("OCR: " + sourceLanguageReadable + " - Mean confidence: " +
                     meanConfidence.toString() + " - Time required: " + recognitionTimeRequired + " ms");
+
+            Log.i("Meanconfidence:", statusViewBottom.toString());
+
         }
     }
 
