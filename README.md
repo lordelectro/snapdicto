@@ -25,7 +25,7 @@
 
   - Dictionary: This retrieves dictionary meaning of the word recognized. (done)
 
-  - Thesaurus: This retrieves suggested words for the recognized word.
+  - Thesaurus: This retrieves suggested words for the recognized word. (done)
 
   - Weblinks: This will prompt opening up a web-browser of the recognized weblink.
 
